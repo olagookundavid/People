@@ -13,7 +13,7 @@ class NetworkingManager {
     private init(){
         
     }
-    func request<T: Codable>(absUrl:String, type: T.Type,
+    func request<T: Codable>(methodtype: methodType = .get, absUrl:String, type: T.Type,
                              completion: @escaping ((Result<T, Error>) -> Void)
     ){
     
@@ -23,7 +23,7 @@ class NetworkingManager {
         }
         
         
-        let request = URLRequest(url: url)
+        let request = buildRequest(url: url, methodtype: methodtype)
         
         let dataTask = URLSession.shared.dataTask(with: request) { data, response, error in
             if error != nil {
@@ -54,16 +54,87 @@ class NetworkingManager {
         }
         dataTask.resume()
     }
+    
+    
+    func request(methodtype: methodType = .get,absUrl:String,
+                             completion: @escaping ((Result<(), Error>) -> Void)
+    ){
+    
+        guard let url = URL(string: absUrl) else{
+            completion(.failure(NetworkingError.invalidUrl))
+            return
+        }
+        
+        
+        let request = buildRequest(url: url, methodtype: methodtype)
+        
+        let dataTask = URLSession.shared.dataTask(with: request) { data, response, error in
+            if error != nil {
+                completion(.failure(NetworkingError.custom(error: error!)))
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse, (200...300) ~= response.statusCode else {
+                completion(.failure(NetworkingError.invalidStatusCode(statusCode: (response as! HTTPURLResponse).statusCode )))
+                return
+            }
+            completion(.success(()))
+            
+        }
+        dataTask.resume()
+    }
    
 }
 
 
 extension NetworkingManager {
-    enum NetworkingError: Error{
+    enum NetworkingError: LocalizedError{
         case invalidUrl
         case custom(error: Error)
         case invalidStatusCode(statusCode: Int)
         case invalidData
         case failedToDecode(error : Error)
+        
+        var errorDescription: String?{
+            switch self{
+                
+            case .invalidUrl:
+                return "Url not valid"
+            case .invalidStatusCode:
+                return  "Invalid status code"
+            case .invalidData:
+                return  "Response data is invalid"
+            case .failedToDecode:
+                return "Failed to decode response"
+            case .custom(error: let error):
+                return "Something went wrong \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    enum methodType{
+        case get
+        case post(data: Data?)
+        case put(data: Data?)
+        case delete(data: Data?)
+    }
+    
+    
+    func buildRequest (url: URL, methodtype: methodType) -> URLRequest{
+        var request = URLRequest(url: url)
+        switch methodtype{
+        case .get:
+            request.httpMethod = "Get"
+        case .post(let data):
+            request.httpMethod = "POST"
+            request.httpBody = data
+        case .put(let data):
+            request.httpMethod = "PUT"
+            request.httpBody = data
+        case .delete(let data):
+            request.httpMethod = "DELETE"
+            request.httpBody = data
+        }
+        return request
     }
 }

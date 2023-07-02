@@ -8,34 +8,40 @@
 import SwiftUI
 
 struct DetailView: View {
-    @State private var userInfo : UserDetailResponse?
+    @StateObject private var dvm = DetailViewModel()
+    let userId: Int
+    
     var body: some View {
         ZStack {
             background
-            ScrollView{
-                VStack(alignment: .leading, spacing: 18){
-                avatar
-                Group{
-                       General
-                        link
-                   }
-                   .padding(.horizontal,8)
-                   .padding(.vertical,18)
-                   .background(Theme.detailBackground,in:RoundedRectangle(cornerRadius: 16,style: .continuous))
-                    
-                    
-                    
-                }.padding()
+            
+            if(dvm.isLoading){
+                ProgressView()
             }
+            else{
+                ScrollView{
+                    VStack(alignment: .leading, spacing: 18){
+                    avatar
+                    Group{
+                           General
+                            link
+                       }
+                       .padding(.horizontal,8)
+                       .padding(.vertical,18)
+                       .background(Theme.detailBackground,in:RoundedRectangle(cornerRadius: 16,style: .continuous))
+                        
+                        
+                        
+                    }.padding()
+                }
+            }
+            
         }
         .navigationTitle("Details")
         .onAppear{
-            do{
-                userInfo = try StaticJSONMapper.decode(file: "SingleUserData", type: UserDetailResponse.self)
-               
-            } catch{
-                print (error)
-            }
+            dvm.fetchUsers(userId: userId)
+        } .alert(isPresented: $dvm.hasError, error: dvm.error) {
+            
         }
     }
 }
@@ -50,7 +56,7 @@ private extension DetailView{
     @ViewBuilder
     var avatar: some View{
         
-        if let avatarString =  userInfo?.data.avatar,
+        if let avatarString =  dvm.userInfo?.data.avatar,
            let avatarUrl = URL(string: avatarString){
             
             AsyncImage(url: avatarUrl) { Image in
@@ -60,17 +66,21 @@ private extension DetailView{
                     .frame(height: 130)
                     .clipped()
             } placeholder: {
-                ProgressView()
-                    .frame(width: .infinity, height: 130,alignment: .center)
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame( height: 130)
             }
             
         }}
     
   @ViewBuilder
     var link: some View{
-        if let supportAbsString = userInfo?.support.url,
+        if let supportAbsString = dvm.userInfo?.support.url,
            let supportUrl = URL(string: supportAbsString),
-           let supportTxt = userInfo?.support.text{
+           let supportTxt = dvm.userInfo?.support.text{
             
           Link(destination: supportUrl){
                 HStack{
@@ -99,7 +109,7 @@ private extension DetailView{
  
     var General : some View{
         VStack(alignment: .leading, spacing: 8){
-           PillView(id:userInfo?.data.id  ?? 0)
+            PillView(id: dvm.userInfo?.data.id  ?? 0)
             
             Group{
                FirstName
@@ -117,7 +127,7 @@ private extension DetailView{
         Text("First Name")
             .font(.system(.body, design: .rounded)
                 .weight(.semibold))
-        Text(userInfo?.data.firstName ?? "__")
+        Text(dvm.userInfo?.data.firstName ?? "__")
             .font(.system(.subheadline, design: .rounded)
                 )
         Divider()
@@ -127,7 +137,7 @@ private extension DetailView{
         Text("Last Name")
             .font(.system(.body, design: .rounded)
                 .weight(.semibold))
-        Text(userInfo?.data.lastName ?? "__")
+        Text(dvm.userInfo?.data.lastName ?? "__")
             .font(.system(.subheadline, design: .rounded)
                 )
         Divider()
@@ -137,7 +147,7 @@ private extension DetailView{
         Text("Email")
             .font(.system(.body, design: .rounded)
                 .weight(.semibold))
-        Text(userInfo?.data.email ?? "__")
+        Text(dvm.userInfo?.data.email ?? "__")
             .font(.system(.subheadline, design: .rounded)
                 )
     }
@@ -145,9 +155,15 @@ private extension DetailView{
 
 
 struct DetailView_Previews: PreviewProvider {
+    private static var previewUserId: Int{
+        let users = try! StaticJSONMapper.decode(file: "UsersStaticData", type: UsersResponse.self)
+        return users.data.first!.id
+    }
+    
+    
     static var previews: some View {
         NavigationView {
-            DetailView()
+            DetailView(userId: previewUserId)
         }
     }
 }

@@ -9,6 +9,9 @@ import SwiftUI
 
 struct CreateView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var cvm = CreateViewModel()
+    let successfulAction : () -> Void
+    
     var body: some View {
         NavigationView {
             Form{
@@ -19,26 +22,38 @@ struct CreateView: View {
                 Section{
                     submit
                 }
-            }.navigationTitle("Create")
+            }
+            .disabled(cvm.state == .submitting)
+            .navigationTitle("Create")
                 .toolbar{
                     ToolbarItem(placement: .primaryAction){
                         done
                     }
                 }
+                .onChange(of: cvm.state) { formState in
+                    if formState == .successful{
+                        dismiss()
+                        successfulAction()
+                    }
+                }
+                .alert(isPresented: $cvm.hasError, error: cvm.error) {
+                    
+                }
+                .overlay{if  cvm.state == .submitting {ProgressView()}}
         }
     }
 }
 private extension CreateView {
     var firstName : some View{
-        TextField("First Name", text: .constant(""))
+        TextField("First Name", text: $cvm.person.firstName)
     }
     
     var lastName : some View{
-        TextField("Last Name", text: .constant(""))
+        TextField("Last Name", text: $cvm.person.lastName)
     }
     
     var job : some View{
-        TextField("Job", text: .constant(""))
+        TextField("Job", text: $cvm.person.job)
     }
     
     
@@ -52,13 +67,13 @@ private extension CreateView {
     
     var submit : some View{
         Button("Submit") {
-            
+            cvm.create()
         }
     }
 }
 
 struct CreateView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateView()
+        CreateView{}
     }
 }

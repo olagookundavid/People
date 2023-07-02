@@ -16,6 +16,7 @@ struct PeoplesApp: App {
                 Symbols.person
                 Text("Home")
             }
+                .tag(1)
         }
     }
 }
