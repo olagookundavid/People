@@ -17,7 +17,7 @@ final class PeopleViewModel: ObservableObject{
     
     func fetchUsers(){
         isLoading = true
-        NetworkingManager.shared.request(absUrl: "https://reqres.in/api/users/", type: UsersResponse.self) {[weak self] res in
+        NetworkingManager.shared.request(endpoint: .people, type: UsersResponse.self) {[weak self] res in
             
             switch res{
             case .success(let response):
