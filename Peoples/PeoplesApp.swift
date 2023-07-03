@@ -11,12 +11,20 @@ import SwiftUI
 struct PeoplesApp: App {
     var body: some Scene {
         WindowGroup {
-            PeopleView()
-                .tabItem {
-                Symbols.person
-                Text("Home")
-            }
+            TabView {
+                PeopleView()
+                    .tabItem {
+                    Symbols.person
+                    Text("Home")
+                }
+                .tag(0)
+                SettingsView()
+                    .tabItem {
+                    Symbols.gear
+                    Text("Settings")
+                }
                 .tag(1)
+            }
         }
     }
 }

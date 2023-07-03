@@ -9,7 +9,7 @@ import SwiftUI
 struct PeopleView: View {
     
     private let columns = Array(repeating: GridItem(.flexible()), count: 2)
-
+    
     @StateObject private var pvm = PeopleViewModel()
     @State private var showCreate = false
     @State private var shouldShowSuccess = false
@@ -36,7 +36,7 @@ struct PeopleView: View {
                         ToolbarItem(placement: .primaryAction){
                             create
                         }
-                }
+                    }
                 }
             }
             .onAppear{
@@ -45,11 +45,17 @@ struct PeopleView: View {
             }
             .sheet(isPresented: $showCreate) {
                 CreateView{
-                    
+                    haptic(notification: .success)
+                    withAnimation(.spring().delay(0.25)){
+                        self.shouldShowSuccess.toggle()
+                    }
                 }
             }
             .alert(isPresented: $pvm.hasError, error: pvm.error) {
-              
+                Button("Retry"){
+                    pvm.fetchUsers()
+                }
+                
             }
             .overlay{
                 if shouldShowSuccess{
