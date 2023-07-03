@@ -10,14 +10,23 @@ import SwiftUI
 struct CreateView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var cvm = CreateViewModel()
+    @FocusState private var focusedField : Field?
     let successfulAction : () -> Void
     
     var body: some View {
         NavigationView {
             Form{
-                firstName
-                lastName
-                job
+                Section {
+                    firstName
+                    lastName
+                    job
+                } footer: {
+                    if case .validationError(let error)
+                        = cvm.error,
+                       let err = error.errorDescription{
+                        Text(err).foregroundColor(.red)
+                    }
+                }
                 
                 Section{
                     submit
@@ -46,14 +55,17 @@ struct CreateView: View {
 private extension CreateView {
     var firstName : some View{
         TextField("First Name", text: $cvm.person.firstName)
+            .focused($focusedField,equals: .firstName)
     }
     
     var lastName : some View{
         TextField("Last Name", text: $cvm.person.lastName)
+            .focused($focusedField,equals: .lastName)
     }
     
     var job : some View{
         TextField("Job", text: $cvm.person.job)
+            .focused($focusedField,equals: .job)
     }
     
     
@@ -63,14 +75,20 @@ private extension CreateView {
         }
     }
     
-    
-    
     var submit : some View{
         Button("Submit") {
+            focusedField = nil
             cvm.create()
         }
     }
 }
+extension CreateView {
+    enum Field{
+        case firstName,lastName,job
+        
+    }
+}
+
 
 struct CreateView_Previews: PreviewProvider {
     static var previews: some View {
