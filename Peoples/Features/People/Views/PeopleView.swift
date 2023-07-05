@@ -13,6 +13,8 @@ struct PeopleView: View {
     @StateObject private var pvm = PeopleViewModel()
     @State private var showCreate = false
     @State private var shouldShowSuccess = false
+    @State private var hasAppeared = false
+    
     
     var body: some View {
         NavigationView {
@@ -36,11 +38,18 @@ struct PeopleView: View {
                         ToolbarItem(placement: .primaryAction){
                             create
                         }
+                        ToolbarItem(placement: .navigationBarLeading){
+                            refresh
+                        }
                     }
+                    
                 }
             }
-            .onAppear{
-                pvm.fetchUsers()
+            .task{
+                if(!hasAppeared){
+                    await pvm.fetchUsers()
+                    hasAppeared.toggle()
+                }
                 
             }
             .sheet(isPresented: $showCreate) {
@@ -53,7 +62,9 @@ struct PeopleView: View {
             }
             .alert(isPresented: $pvm.hasError, error: pvm.error) {
                 Button("Retry"){
-                    pvm.fetchUsers()
+                    Task {
+                        await  pvm.fetchUsers()
+                    }
                 }
                 
             }
@@ -80,6 +91,16 @@ private extension PeopleView{
             showCreate.toggle()
         }label: {
             Symbols.plus
+                .font(.system(.headline,design: .rounded).bold())
+        }.disabled(pvm.isLoading)
+    }
+    var refresh: some View{
+        Button{
+            Task{
+                await pvm.fetchUsers()
+            }
+        }label: {
+            Symbols.refresh
                 .font(.system(.headline,design: .rounded).bold())
         }.disabled(pvm.isLoading)
     }

@@ -38,8 +38,8 @@ struct DetailView: View {
             
         }
         .navigationTitle("Details")
-        .onAppear{
-            dvm.fetchUsers(userId: userId)
+        .task{
+            await dvm.fetchUsers(userId: userId)
         } .alert(isPresented: $dvm.hasError, error: dvm.error) {
             
         }

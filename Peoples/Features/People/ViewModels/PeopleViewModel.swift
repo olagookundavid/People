@@ -7,27 +7,29 @@
 
 import Foundation
 
-@MainActor
+
 final class PeopleViewModel: ObservableObject{
     @Published private(set) var users:[User] = []
     @Published private(set) var error: NetworkingManager.NetworkingError?
     @Published var hasError: Bool = false
     @Published var isLoading: Bool = false
     
-    
-    func fetchUsers(){
-        isLoading = true
-        NetworkingManager.shared.request(endpoint: .people, type: UsersResponse.self) {[weak self] res in
-            
-            switch res{
-            case .success(let response):
-                self?.users = response.data
-                self?.isLoading = false
-            case .failure(let error):
-                self?.hasError = true
-                self?.error = error as? NetworkingManager.NetworkingError
-                self?.isLoading = false
-            } 
+    @MainActor
+    func fetchUsers() async {
+        
+        self.isLoading = true
+        self.hasError = false
+        defer{isLoading = false}
+        do{
+            let  response = try await NetworkingManager.shared.request(endpoint: .people, type: UsersResponse.self)
+            self.users = response.data
+        }catch{
+            self.hasError = true
+            if let networkingError = error as? NetworkingManager.NetworkingError{
+                self.error = networkingError
+            } else{
+                self.error = .custom(error: error)
+            }
         }
     }
 }

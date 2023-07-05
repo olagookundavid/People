@@ -22,7 +22,7 @@ struct SettingsView: View {
 
 private extension SettingsView{
     var haptics: some View{
-        Toggle("Enable Haptics", isOn: .constant(true))
+        Toggle("Enable Haptics", isOn: $isHapticEnabled)
     }
 }
 

@@ -34,21 +34,21 @@ struct CreateView: View {
             }
             .disabled(cvm.state == .submitting)
             .navigationTitle("Create")
-                .toolbar{
-                    ToolbarItem(placement: .primaryAction){
-                        done
-                    }
+            .toolbar{
+                ToolbarItem(placement: .primaryAction){
+                    done
                 }
-                .onChange(of: cvm.state) { formState in
-                    if formState == .successful{
-                        dismiss()
-                        successfulAction()
-                    }
+            }
+            .onChange(of: cvm.state) { formState in
+                if formState == .successful{
+                    dismiss()
+                    successfulAction()
                 }
-                .alert(isPresented: $cvm.hasError, error: cvm.error) {
-                    
-                }
-                .overlay{if  cvm.state == .submitting {ProgressView()}}
+            }
+            .alert(isPresented: $cvm.hasError, error: cvm.error) {
+                
+            }
+            .overlay{if  cvm.state == .submitting {ProgressView()}}
         }
     }
 }
@@ -78,7 +78,10 @@ private extension CreateView {
     var submit : some View{
         Button("Submit") {
             focusedField = nil
-            cvm.create()
+            Task{
+               await cvm.create()
+            }
+            
         }
     }
 }
