@@ -21,14 +21,14 @@ struct DetailView: View {
             else{
                 ScrollView{
                     VStack(alignment: .leading, spacing: 18){
-                    avatar
-                    Group{
-                           General
+                        avatar
+                        Group{
+                            General
                             link
-                       }
-                       .padding(.horizontal,8)
-                       .padding(.vertical,18)
-                       .background(Theme.detailBackground,in:RoundedRectangle(cornerRadius: 16,style: .continuous))
+                        }
+                        .padding(.horizontal,8)
+                        .padding(.vertical,18)
+                        .background(Theme.detailBackground,in:RoundedRectangle(cornerRadius: 16,style: .continuous))
                         
                         
                         
@@ -47,7 +47,7 @@ struct DetailView: View {
 }
 
 private extension DetailView{
- 
+    
     
     var background: some View{
         Theme.background.ignoresSafeArea(edges:.top)
@@ -76,13 +76,13 @@ private extension DetailView{
             
         }}
     
-  @ViewBuilder
+    @ViewBuilder
     var link: some View{
         if let supportAbsString = dvm.userInfo?.support.url,
            let supportUrl = URL(string: supportAbsString),
            let supportTxt = dvm.userInfo?.support.text{
             
-          Link(destination: supportUrl){
+            Link(destination: supportUrl){
                 HStack{
                     VStack(alignment: .leading, spacing: 8){
                         Text(supportTxt)
@@ -101,24 +101,24 @@ private extension DetailView{
         
         
         
-      
+        
     }
 }
 
 private extension DetailView{
- 
+    
     var General : some View{
         VStack(alignment: .leading, spacing: 8){
             PillView(id: dvm.userInfo?.data.id  ?? 0)
             
             Group{
-               FirstName
+                FirstName
                 LastName
                 Email
             }
-                
+            
         }
-       
+        
     }
     
     
@@ -129,7 +129,7 @@ private extension DetailView{
                 .weight(.semibold))
         Text(dvm.userInfo?.data.firstName ?? "__")
             .font(.system(.subheadline, design: .rounded)
-                )
+            )
         Divider()
     }
     @ViewBuilder
@@ -139,7 +139,7 @@ private extension DetailView{
                 .weight(.semibold))
         Text(dvm.userInfo?.data.lastName ?? "__")
             .font(.system(.subheadline, design: .rounded)
-                )
+            )
         Divider()
     }
     @ViewBuilder
@@ -149,7 +149,7 @@ private extension DetailView{
                 .weight(.semibold))
         Text(dvm.userInfo?.data.email ?? "__")
             .font(.system(.subheadline, design: .rounded)
-                )
+            )
     }
 }
 
@@ -162,8 +162,8 @@ struct DetailView_Previews: PreviewProvider {
     
     
     static var previews: some View {
-        NavigationView {
-            DetailView(userId: previewUserId)
-        }
+        
+        DetailView(userId: previewUserId)
+            .embedInNavigation()
     }
 }

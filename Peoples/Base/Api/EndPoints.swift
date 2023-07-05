@@ -7,7 +7,7 @@
 
 import Foundation
 enum EndPoint{
-    case create(submissionData: Data?), detail(id: Int), people
+    case create(submissionData: Data?), detail(id: Int), people(page: Int)
 }
 
 
@@ -29,6 +29,15 @@ extension EndPoint{
         case delete(data: Data?)
     }
     
+    var queryItems: [String: String]? {
+        switch self{
+        case .people(let page):
+            return ["page":"\(page)"]
+        default:
+            return nil
+        }
+    }
+    
     var methodType: MethodType{
         switch self {
         case .people,
@@ -44,12 +53,16 @@ extension EndPoint{
         urlComponents.scheme = "https"
         urlComponents.host = host
         urlComponents.path = path
+        var requestQueryItems = queryItems?.compactMap { item in
+            URLQueryItem(name: item.key, value: item.value)
+        }
         
 #if DEBUG
-        urlComponents.queryItems = [
-            URLQueryItem(name: "delay", value: "3")
-        ]
+        requestQueryItems?.append(
+            URLQueryItem(name: "delay", value: "3"))
+        
 #endif
+        urlComponents.queryItems = requestQueryItems
         return urlComponents.url
         
         

@@ -14,7 +14,6 @@ struct CreateView: View {
     let successfulAction : () -> Void
     
     var body: some View {
-        NavigationView {
             Form{
                 Section {
                     firstName
@@ -49,9 +48,10 @@ struct CreateView: View {
                 
             }
             .overlay{if  cvm.state == .submitting {ProgressView()}}
+            .embedInNavigation()
         }
     }
-}
+
 private extension CreateView {
     var firstName : some View{
         TextField("First Name", text: $cvm.person.firstName)
@@ -72,7 +72,7 @@ private extension CreateView {
     var done : some View{
         Button("Done") {
             dismiss()
-        }
+        }.disabled(cvm.state == .submitting)
     }
     
     var submit : some View{

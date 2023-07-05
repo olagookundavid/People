@@ -11,12 +11,12 @@ struct SettingsView: View {
     
     @AppStorage(UserDefaultsKeys.hapticsEnabled) private var isHapticEnabled: Bool = true
     var body: some View {
-        NavigationView{
             Form{
                 haptics
             }
             .navigationTitle("Settings")
-        }
+            .embedInNavigation()
+        
     }
 }
 

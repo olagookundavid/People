@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE25E2E12A55154400970307 /* View+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE25E2E02A55154400970307 /* View+Navigation.swift */; };
 		BE379B6E2A53507C00DA7826 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE379B6D2A53507C00DA7826 /* Haptics.swift */; };
 		BE379B702A53543400DA7826 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE379B6F2A53543400DA7826 /* SettingsView.swift */; };
 		BE379B732A53560100DA7826 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE379B722A53560100DA7826 /* UserDefaultsKeys.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE25E2E02A55154400970307 /* View+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "View+Navigation.swift"; path = "../../../../../Downloads/View+Navigation.swift"; sourceTree = "<group>"; };
 		BE379B6D2A53507C00DA7826 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		BE379B6F2A53543400DA7826 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BE379B722A53560100DA7826 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
@@ -79,6 +81,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE25E2DF2A55152300970307 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BE25E2E02A55154400970307 /* View+Navigation.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		BE379B6C2A53506900DA7826 /* Haptics */ = {
 			isa = PBXGroup;
 			children = (
@@ -274,6 +284,7 @@
 		BE7C521D2A4445BF0055108C /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				BE25E2DF2A55152300970307 /* Extensions */,
 				BE379B712A5355E800DA7826 /* UserDeafaults */,
 				BE379B6C2A53506900DA7826 /* Haptics */,
 				BE3A3D192A4EB4BF00F03EF7 /* Api */,
@@ -424,6 +435,7 @@
 				BE5202922A454DF1003124B8 /* UserDetailResponse.swift in Sources */,
 				BE3A3D1B2A4EB4DC00F03EF7 /* NetworkingManager.swift in Sources */,
 				BE379B6E2A53507C00DA7826 /* Haptics.swift in Sources */,
+				BE25E2E12A55154400970307 /* View+Navigation.swift in Sources */,
 				BE52029C2A45608B003124B8 /* symbol.swift in Sources */,
 				BE5202A52A458856003124B8 /* PersonItemView.swift in Sources */,
 				BE379B732A53560100DA7826 /* UserDefaultsKeys.swift in Sources */,

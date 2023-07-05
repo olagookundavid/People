@@ -17,7 +17,6 @@ class CreateViewModel: ObservableObject{
     private let validator = Validator()
     @MainActor
     func create() async{
-        
         do{
             try validator.validate(person: person)
             state = .submitting
@@ -26,6 +25,7 @@ class CreateViewModel: ObservableObject{
             let data = try? encoder.encode(person)
             
             try await NetworkingManager.shared.request(endpoint: .create(submissionData: data))
+            state = .successful
         }catch{
             self.hasError = true
             self.state = .unsuccessful
@@ -57,7 +57,7 @@ extension CreateViewModel {
         var errorDescription: String?{
             switch self{
             case .networkingError(error: let err),
-                .validationError(error: let err):
+                    .validationError(error: let err):
                 return err.errorDescription
             case .systemError(error: let err):
                 return err.localizedDescription

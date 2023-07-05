@@ -17,7 +17,7 @@ struct PeopleView: View {
     
     
     var body: some View {
-        NavigationView {
+       
             ZStack {
                 background
                 
@@ -29,8 +29,20 @@ struct PeopleView: View {
                             ForEach(pvm.users,id: \.id){user in
                                 NavigationLink(destination: DetailView(userId: user.id), label: {
                                     PersonItemView(user: user)
+                                        .task {
+                                            if pvm.hasReachedEnd(user: user) && !pvm.isFetching{
+                                                await pvm.fetchNextUsers()
+                                            }
+                                        }
                                 })
                             }.padding()
+                        }
+                    }.refreshable {
+                        await pvm.fetchUsers()
+                    }
+                    .overlay(alignment: .bottom){
+                        if pvm.isFetching{
+                            ProgressView()
                         }
                     }
                     .navigationTitle("People")
@@ -81,9 +93,10 @@ struct PeopleView: View {
                         }
                 }
             }
+            .embedInNavigation()
         }
     }
-}
+
 
 private extension PeopleView{
     var create: some View{
