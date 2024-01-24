@@ -14,7 +14,15 @@ class CreateViewModel: ObservableObject{
     @Published private(set) var error: FormError?
     @Published var hasError: Bool = false
     
-    private let validator = Validator()
+    private let networkingManager: NetworkingManagerImpl!
+    private let validator: CreateValidatorImpl!
+    
+    init(networkingManager: NetworkingManagerImpl = NetworkingManager.shared,
+         validator: CreateValidatorImpl = Validator()) {
+        self.networkingManager = networkingManager
+        self.validator = validator
+    }
+    
     @MainActor
     func create() async{
         do{
@@ -62,6 +70,21 @@ extension CreateViewModel {
             case .systemError(error: let err):
                 return err.localizedDescription
             }
+        }
+    }
+}
+extension CreateViewModel.FormError: Equatable {
+    
+    static func == (lhs: CreateViewModel.FormError, rhs: CreateViewModel.FormError) -> Bool {
+        switch (lhs, rhs) {
+        case (.networkingError(let lhsType), .networkingError(let rhsType)):
+            return lhsType.errorDescription == rhsType.errorDescription
+        case (.validationError(let lhsType), .validationError(let rhsType)):
+            return lhsType.errorDescription == rhsType.errorDescription
+        case (.systemError(let lhsType), .systemError(let rhsType)):
+            return lhsType.localizedDescription == rhsType.localizedDescription
+        default:
+            return false
         }
     }
 }

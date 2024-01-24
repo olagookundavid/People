@@ -7,13 +7,23 @@
 
 import Foundation
 
-class NetworkingManager {
+protocol NetworkingManagerImpl {
+    
+    func request<T: Codable>(session: URLSession,
+                              endpoint: EndPoint,
+                             type: T.Type) async throws -> T
+    
+    func request(session: URLSession,
+                 endpoint: EndPoint) async throws
+}
+
+final class NetworkingManager: NetworkingManagerImpl {
     
     static let shared = NetworkingManager()
     private init(){
         
     }
-    func request<T: Codable>(endpoint: EndPoint, type: T.Type) async throws  -> T{
+    func request<T: Codable>(session: URLSession = .shared, endpoint: EndPoint, type: T.Type) async throws  -> T{
     
         guard let url = endpoint.url else{
             throw NetworkingError.invalidUrl
@@ -22,7 +32,7 @@ class NetworkingManager {
         
         let request = buildRequest(url: url, methodtype: endpoint.methodType)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         
         
         guard let response = response as? HTTPURLResponse,
@@ -34,24 +44,22 @@ class NetworkingManager {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let res = try decoder.decode(T.self , from: data)
-        
         return res
-        
     }
     
     
-    func request(endpoint: EndPoint) async throws {
-    
+    func request(session: URLSession = .shared, endpoint: EndPoint) async throws {
+
         guard let url = endpoint.url else{
             throw NetworkingError.invalidUrl
         }
-        
-        
+
+
         let request = buildRequest(url: url, methodtype: endpoint.methodType)
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        
-        
+
+        let (_, response) = try await session.data(for: request)
+
+
         guard let response = response as? HTTPURLResponse,
               (200...300) ~= response.statusCode else {
             let statusCode = (response as! HTTPURLResponse).statusCode
@@ -87,13 +95,6 @@ extension NetworkingManager {
         }
     }
     
-//    enum methodType{
-//        case get
-//        case post(data: Data?)
-//        case put(data: Data?)
-//        case delete(data: Data?)
-//    }
-    
     
     func buildRequest (url: URL, methodtype: EndPoint.MethodType) -> URLRequest{
         var request = URLRequest(url: url)
@@ -111,5 +112,25 @@ extension NetworkingManager {
             request.httpBody = data
         }
         return request
+    }
+}
+
+extension NetworkingManager.NetworkingError: Equatable {
+    
+    static func == (lhs: NetworkingManager.NetworkingError, rhs: NetworkingManager.NetworkingError) -> Bool {
+        switch(lhs, rhs) {
+        case (.invalidUrl, .invalidUrl):
+            return true
+        case (.custom(let lhsType), .custom(let rhsType)):
+            return lhsType.localizedDescription == rhsType.localizedDescription
+        case (.invalidStatusCode(let lhsType), .invalidStatusCode(let rhsType)):
+            return lhsType == rhsType
+        case (.invalidData, .invalidData):
+            return true
+        case (.failedToDecode(let lhsType), .failedToDecode(let rhsType)):
+            return lhsType.localizedDescription == rhsType.localizedDescription
+        default:
+            return false
+        }
     }
 }
